@@ -7,6 +7,20 @@ import cv2
 SIM_IMAGE_SIZE = (640, 480)
 
 def find_distance(image_1, image_2):
+    """ docstring for find_distance
+    
+    - makes assumption that images being passed in are of
+    same size; else resize to same size
+    - 
+
+    Using a FLANN-based feature matcher with the ORB algorithm to find matching
+features between 2 given images. The Hamming distance between the feature
+descriptors is calculated; with a lower distance indicating a better match in
+features.
+
+The average of the 10 best (lowest distance) matches is used as an indicator of
+the similarity of the given images.
+    """
     # Converting to grayscale; assuming images are already of same size
     img1 = cv2.imread(image_1, cv2.IMREAD_GRAYSCALE)
     img2 = cv2.imread(image_2, cv2.IMREAD_GRAYSCALE)
@@ -40,14 +54,33 @@ def find_distance(image_1, image_2):
     return averageDist
 
 def main(handshake_dict, output_file):
-    """ docstring for main function """
+    """ docstring for main function 
+    
+    """
     # assuming length of arguments passed in should be 2
+    
+    # same_dict = {}
+    same_threshold = 20 # arbitrary value
+    # same_dict will map each image to a list of images 
+    # with an avg. distance less than the 'same' threshold
+    # similar_dict = {}
+    similar_threshold = 100
+    # similar_dict will map each image to a list of images 
+    # with an avg. distance less than the 'similar' 
+    # threshold
 
     # output_file.truncate() # wipe file of previous results
     for image_a in handshake_dict:
-        for image_b in handshake_dict[image_a]:
-            dist = find_distance(image_a, image_b)
-            print('File 1: %s, File 2: %s, Distance: %f' % (image_a, image_b, dist))
+        same_list = filter(lambda x: find_distance(image_a, x) < same_threshold, handshake_dict[image_a])
+        # same_dict[image_a] = same_list
+
+        # similar_list = filter(lambda x: find_distance(image_a, x) < similar_threshold, handshake_dict[image_a])
+        # similar_dict[image_a] = similar_list
+
+        output_file.write('File: %s, Same images: %s \n' % (image_a, str(same_list)))
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    # assuming argv[1] and argv[2] are the handshake dict
+    # and the output file location, passed in when the
+    # find_matches_script is called from the __main__ file.
+    main(sys.argv[1], sys.argv[2])
