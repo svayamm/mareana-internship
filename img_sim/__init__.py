@@ -11,13 +11,14 @@ class FindMatchingImages(object):
     """
 
     def run(self):
+        """ docstring for main run function """
         self.imgFilePath = Path('img_sim/test_output_img')
         self.outputFile = open('img_sim/results.txt', 'w+')
 
         if not self.imgFilePath.exists():
-            print 'Image path does not exist!'
+            print('Image path does not exist!')
         elif not self.imgFilePath.is_dir():
-            print 'Image path is not a directory!'
+            print('Image path is not a directory!')
         else:
             # obtains list of .png files in given directory
             # -- can adjust to find multiple filetypes
@@ -42,13 +43,13 @@ def create_handshake_dict(imageList):
     handshake = {}
     default = None
     for file1 in imageList[:-1]:
-      if str(file1) not in handshake.keys():
-        handshake[str(file1)] = set()
-      for file2 in imageList:
-        if file1 == file2:
-          continue
-        elif (handshake.get(str(file2), default) is None):
-          handshake[str(file1)].add(str(file2))
+        if str(file1) not in handshake.keys():
+            handshake[str(file1)] = set()
+        for file2 in imageList:
+            if file1 == file2:
+                continue
+            elif handshake.get(str(file2), default) is None:
+                handshake[str(file1)].add(str(file2))
     return handshake
 
 if __name__ == '__main__':
