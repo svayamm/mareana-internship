@@ -3,9 +3,6 @@ import sys
 import numpy as np
 import cv2
 
-# Constant definitions
-SIM_IMAGE_SIZE = (640, 480)
-
 def find_distance(image_1, image_2):
     """ docstring for find_distance
     
@@ -45,11 +42,8 @@ the similarity of the given images.
     distances = [0 for i in xrange(len(matches))]
     for i,(a, b) in enumerate(matches):
         distances[i] = a.distance
-    # Sort them in the ascending order of their distance.
-    distances = sorted(distances)
-    # get average distance of top 10 matches (lowest 10 distances)
+    # get average distance of all matches 
     averageDist = sum(distances)/float(len(distances))
-    # averageDist = sum(distances[:10])/10.0
 
     return averageDist
 
@@ -58,25 +52,14 @@ def main(handshake_dict, output_file):
     
     """
     # assuming length of arguments passed in should be 2
-    
-    # same_dict = {}
+     
     same_threshold = 20 # arbitrary value
-    # same_dict will map each image to a list of images 
-    # with an avg. distance less than the 'same' threshold
-    # similar_dict = {}
-    similar_threshold = 100
-    # similar_dict will map each image to a list of images 
-    # with an avg. distance less than the 'similar' 
-    # threshold
 
-    # output_file.truncate() # wipe file of previous results
     for image_a in handshake_dict:
         same_list = filter(lambda x: find_distance(image_a, x) < same_threshold, handshake_dict[image_a])
-        # same_dict[image_a] = same_list
-
-        # similar_list = filter(lambda x: find_distance(image_a, x) < similar_threshold, handshake_dict[image_a])
-        # similar_dict[image_a] = similar_list
-
+        # same_list will return a list of images 
+        # with an avg. distance less than the 'same' 
+        # threshold
         output_file.write('File: %s, Same images: %s \n' % (image_a, str(same_list)))
 
 if __name__ == '__main__':

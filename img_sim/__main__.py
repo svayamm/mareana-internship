@@ -1,17 +1,19 @@
-import os
-import sys
-# Download and install the pathlib2 library using Miniconda3
-from pathlib2 import Path
-from . import find_matches_script
-
-class FindMatchingImages(object):
-    """docstring for FindMatchingImages.
-    Using python 2.7.* on Miniconda3
-    Uses OpenCV 2.x and Python 2.7.x, installed through Miniconda3
+############################################################
+# img_sim package
+# __main__.py
+# A python script to find similarity between images
+# Author: Svayam Mishra
+# Email: svayamm@cmu.edu
+# Date: 05 Jun 2017
+# Version: 0.3
+############################################################
+# TODO: notes
+"""
+Uses OpenCV 2.x and Python 2.7.x, installed through Miniconda3
     -- this will NOT work with OpenCV 3 / Python 3, due to
     issues with the Python binding.
-    
-    Run with python -m img_sim
+
+    Run with python -m img_sim from containing directory
 
     Note: this is just a quick-and-dirty solution - ideally
     proper error-handling methods would be implemented, and
@@ -19,49 +21,58 @@ class FindMatchingImages(object):
     unit testing
     instead of arbitrary values, optimised
     perhaps inbuilt clustering methods used
+# Download and install the pathlib2 library using Miniconda3
+"""
+
+import os
+import sys
+from pathlib2 import Path
+from . import find_matches_script
+
+class FindMatchingImages(object):
+    """docstring for FindMatchingImages.
+    
     """
 
     def run(self):
         """ docstring for main run function """
-        self.imgFilePath = Path('img_sim/test_output_img')
-        self.outputFile = open('img_sim/results.txt', 'w+')
+        img_File_Path = Path('img_sim/test_output_img')
+        output_File = open('img_sim/results.txt', 'w+')
 
-        if not self.imgFilePath.exists():
+        if not img_File_Path.exists():
             print('Image path does not exist!')
-        elif not self.imgFilePath.is_dir():
+        elif not img_File_Path.is_dir():
             print('Image path is not a directory!')
         else:
             # obtains list of .png files in given directory
             # -- can adjust to find multiple filetypes
-
-            images = self.imgFilePath.glob('**/*.png')
+            images = img_File_Path.glob('**/*.png')
             image_list = [image for image in images]
+            
             # creates a 'handshake dictionary' -- explained in function
             hs_dict = create_handshake_dict(image_list)
-            # print(len(hs_dict.keys()))
-            # lens = [len(hs_dict[key]) for key in hs_dict.keys()]
-            # print(lens)
-            # print(sorted(lens))
-            find_matches_script.main(hs_dict, self.outputFile)
+
+            find_matches_script.main(hs_dict, output_File)
+            output_File.close()
 
 
-def create_handshake_dict(imageList):
-    """docstring for create_handshake_dict.
+# def create_handshake_dict(imageList):
+#     """docstring for create_handshake_dict.
 
-    Based on http://mathworld.wolfram.com/HandshakeProblem.html.
+#     Based on http://mathworld.wolfram.com/HandshakeProblem.html.
 
-    """
-    handshake = {}
-    default = None
-    for file1 in imageList[:-1]:
-        if str(file1) not in handshake.keys():
-            handshake[str(file1)] = set()
-        for file2 in imageList:
-            if file1 == file2:
-                continue
-            elif handshake.get(str(file2), default) is None:
-                handshake[str(file1)].add(str(file2))
-    return handshake
+#     """
+#     handshake = {}
+#     default = None
+#     for file1 in imageList[:-1]:
+#         if str(file1) not in handshake.keys():
+#             handshake[str(file1)] = set()
+#         for file2 in imageList:
+#             if file1 == file2:
+#                 continue
+#             elif handshake.get(str(file2), default) is None:
+#                 handshake[str(file1)].add(str(file2))
+#     return handshake
 
 if __name__ == '__main__':
     obj = FindMatchingImages()
