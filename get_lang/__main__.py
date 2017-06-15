@@ -1,19 +1,13 @@
-############################################################
-# img_sim package
-# __main__.py
-# A python script to find similarity between images
-# Author: Svayam Mishra
-# Email: svayamm@cmu.edu
-# Date: 05 Jun 2017
-# Version: 0.3
-############################################################
-# TODO: notes
 """
-Uses Pandas and Python 2.7.x, installed through Miniconda3
+Uses Pandas, Pathlib, and Python 3.4.x, installed through 
+Miniconda3
 
+Prior to running program:
+Download/install the Google Cloud SDK
+Set up authentication and billing for Cloud Translation API
+ -- specifically, using a service account
 
 Run following commands prior to running program:
-Download/install the Google Cloud SDK
 pip install --upgrade google-cloud-translate
 gcloud auth application-default login
 
@@ -21,6 +15,7 @@ gcloud auth application-default login
 
 import sys
 import pandas as pd
+from pathlib import Path
 # Imports the Google Cloud client library
 from google.cloud import translate
 
@@ -211,19 +206,18 @@ GTRANS_LANG_CODES = {
 	'za': 'Zhuang, Chuang',
 	'zu': 'Zulu',
 }
-# global variables
-input_csv = {}
 
 class DetectLanguage(object):
     """docstring for DetectLanguage.
     
     """
-
     def run(self):
         """ docstring for main run function """
-        if not input_csv:
-            read_file = pd.read_csv(input_csv)
-            read_file['Language'] = detect_language(read_file['Text'])
+
+        text_File_Path = Path('./trial.csv')
+        if text_File_Path.exists():
+            read_file = pd.read_csv(text_File_Path)
+            read_file['Language'] = [detect_language(txt) for txt in read_file['Text']]
             read_file.to_csv('results.csv')
 
 
@@ -236,10 +230,9 @@ def detect_language(text):
     # each text.
     result = translate_client.detect_language(text)
 
-    print('Language: {}'.format(result['language']))
+    # print('Language: {}'.format(result['language']))
     return GTRANS_LANG_CODES[result['language']]
 
 if __name__ == '__main__':
-    input_csv = sys.argv[1]
     obj = DetectLanguage()
     obj.run()

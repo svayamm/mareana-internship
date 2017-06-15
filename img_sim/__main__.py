@@ -22,6 +22,7 @@ Uses OpenCV 2.x and Python 2.7.x, installed through Miniconda3
     instead of arbitrary values, optimised
     perhaps inbuilt clustering methods used
 # Download and install the pathlib2 library using Miniconda3
+empty the output folder before running
 """
 
 import os
@@ -39,16 +40,8 @@ class FindMatchingImages(object):
         img_File_Path = Path('img_sim/test_output_img')
         output_File = open('img_sim/results.txt', 'w+')
 
-        if not img_File_Path.exists():
-            print('Image path does not exist!')
-        elif not img_File_Path.is_dir():
-            print('Image path is not a directory!')
-        else:
-            # obtains list of .png files in given directory
-            # -- can adjust to find multiple filetypes
-            images = img_File_Path.glob('**/*.png')
-            image_list = [image for image in images]
-            
+        create_image_list()
+
             # creates a 'handshake dictionary' -- explained in function
             hs_dict = create_handshake_dict(image_list)
 
@@ -73,6 +66,27 @@ class FindMatchingImages(object):
 #             elif handshake.get(str(file2), default) is None:
 #                 handshake[str(file1)].add(str(file2))
 #     return handshake
+
+def create_new_empty_folders():
+    # stuff
+
+def create_image_list():
+
+    if not img_File_Path.exists():
+        print('Image path does not exist!')
+    elif not img_File_Path.is_dir():
+        print('Image path is not a directory!')
+    else:
+        # obtains list of .png files in given directory
+        # -- can adjust to find multiple filetypes
+        images = img_File_Path.glob('**/*.png')
+        image_list = [image for image in images]
+
+def classify_images():
+    # stuff
+
+def sort_folders():
+    # stuff
 
 if __name__ == '__main__':
     obj = FindMatchingImages()
