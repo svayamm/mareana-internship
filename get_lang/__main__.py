@@ -2,6 +2,8 @@
 Uses Pandas, Pathlib, and Python 3.4.x, installed through 
 Miniconda3
 
+Using Pandas for simplified csv interaction
+
 Prior to running program:
 Download/install the Google Cloud SDK
 Set up authentication and billing for Cloud Translation API
@@ -11,6 +13,8 @@ Run following commands prior to running program:
 pip install --upgrade google-cloud-translate
 gcloud auth application-default login
 
+Run from containing folder with:
+$ python -m get_lang
 """
 
 import sys
