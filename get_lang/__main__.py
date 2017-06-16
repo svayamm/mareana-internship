@@ -2,7 +2,7 @@
 Uses Pandas, Pathlib, and Python 3.4.x, installed through 
 Miniconda3
 
-Using Pandas for simplified csv interaction
+Using Pandas for simplified csv interaction.
 
 Prior to running program:
 Download/install the Google Cloud SDK

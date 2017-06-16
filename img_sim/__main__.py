@@ -37,54 +37,45 @@ class FindMatchingImages(object):
 
     def run(self):
         """ docstring for main run function """
-        img_File_Path = Path('img_sim/test_output_img')
-        output_File = open('img_sim/results.txt', 'w+')
+        self.labels_Path = Path('img_sim/test_output_img')
+        self.unclassified_Path = Path('img_sim/test_output_img')
+        self.output_Path = Path('img_sim/test_output_img')
 
-        create_image_list()
+        self.labels_list = [str(x) for x in self.labels_Path.iterdir() if x.is_dir()]
 
-            # creates a 'handshake dictionary' -- explained in function
-            hs_dict = create_handshake_dict(image_list)
-
-            find_matches_script.main(hs_dict, output_File)
-            output_File.close()
-
-
-# def create_handshake_dict(imageList):
-#     """docstring for create_handshake_dict.
-
-#     Based on http://mathworld.wolfram.com/HandshakeProblem.html.
-
-#     """
-#     handshake = {}
-#     default = None
-#     for file1 in imageList[:-1]:
-#         if str(file1) not in handshake.keys():
-#             handshake[str(file1)] = set()
-#         for file2 in imageList:
-#             if file1 == file2:
-#                 continue
-#             elif handshake.get(str(file2), default) is None:
-#                 handshake[str(file1)].add(str(file2))
-#     return handshake
+        unclassified_images = create_image_list()
+        find_matches_script.main(hs_dict, output_File)
 
 def create_new_empty_folders():
-    # stuff
+    for label in self.labels_list:
+        # new_dir = Path resolve (output_path+label)
+        # if not new_dir.exists():
+        #     os.makedirs()
+        continue
 
-def create_image_list():
+def create_image_list(img_Path):
 
-    if not img_File_Path.exists():
+    if not img_Path.exists():
         print('Image path does not exist!')
-    elif not img_File_Path.is_dir():
+    elif not img_Path.is_dir():
         print('Image path is not a directory!')
     else:
         # obtains list of .png files in given directory
         # -- can adjust to find multiple filetypes
-        images = img_File_Path.glob('**/*.png')
+        images = img_Path.glob('**/*.png')
         image_list = [image for image in images]
+    
+    return image_list
 
-def classify_images():
-    # stuff
-
+def classify_images(unclassified_list):
+    return_dict = {label:[] for label in self.labels_list}
+    for label in self.labels_list:
+        # label_path = self.classified_labels_path + label
+        # if not (self.label_path.exists() and label_path.is_dir() and os.listdir(label_path)):
+            # print 'self.invalid label_path' 
+        continue
+    return return_dict
+    
 def sort_folders():
     # stuff
 
