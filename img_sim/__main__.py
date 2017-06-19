@@ -78,6 +78,7 @@ def classify_images(unclassified_list):
     
 def sort_folders():
     # stuff
+    return
 
 if __name__ == '__main__':
     obj = FindMatchingImages()
