@@ -28,96 +28,104 @@ empty the output folder before running
 
 import os
 import sys
+from collections import defaultdict
 import pandas as pd
 from pathlib2 import Path
-from collections import defaultdict
 from . import find_matches_script
 
 class FindMatchingImages(object):
     """docstring for FindMatchingImages.
-    
     """
     def __init__(self):
-        # same_threshold = 20 # arbitrary value
+        self.threshold = 20 # arbitrary value
         self.labels_images_path = Path('img_sim/classifier-labels/images')
         # assuming directory structure of Unclassified has
         # folders for individual images; while Labels are
         # 'flattened' - i.e. no subdirectories
         self.unclassified_path = Path('img_sim/unclassified-imgs-copy')
-        # self.output_Path = Path('img_sim/test_output_img')
 
-        self.label_images_list = create_image_list(self.labels_images_Path)
-        
-        self.unclassified_list = [str(x) for x in self.unclassified_Path.iterdir() if x.is_dir()]
-        
+        self.label_images_list = self.create_image_list(self.labels_images_path)
+
+        self.unclassified_list = [str(x) for x in self.unclassified_path.iterdir() if x.is_dir()]
+
         self.result_dict = defaultdict(dict)
-
-        
 
     def run(self):
         """ docstring for main run function """
-        
         for lbl_img in self.label_images_list:
-            # lbl_img_path = resolve
-            result_dict[lbl_img] = defaultdict(list) 
+            self.result_dict[lbl_img] = defaultdict(list)
 
-        find_matches_script.main(hs_dict, output_File)
+        self.fill_results_dict()
+        self.format_csv()
 
-    
     def fill_results_dict(self):
-        """ docstring for main run function 
-        
-        regarding efficiency - 
+        """ docstring for fill_results_dict function
+        regarding efficiency -
         nested for loop results in higher-order polynomial
         complexity; necessitated due to pairwise comparison?
 
         Path.iterdir() v os.scandir()
-        
         """
         for lbl_img in self.label_images_list:
-            # lbl_img_path = resolve
-            for x in self.unclassified_Path.iterdir():
-                if x.is_dir(): 
+            for x in self.unclassified_path.iterdir():
+                if x.is_dir():
                 # x is a main file directory -
                 # e.g. directory for img 'abc001'
-                    sub_level_imgs = create_image_list(x)
+
+                    sub_level_imgs = self.create_image_list(x)
                     # list of 'dissected' levels of main
                     # file - 'abc001_L2_15, abc001_L7_0' etc
 
-            continue
+                    x_path = self.unclassified_path / x
+
+                    x_dist = self.classify_sub_images(lbl_img, sub_level_imgs, x_path)
+
+                    self.result_dict[lbl_img][str(x.name)] = filter(lambda d: d < self.threshold, x_dist)
+
     
-    @staticmethod
-    def create_image_list(imgPath):
+    def create_image_list(self, image_path):
         """ docstring for main run function """
-        if not imgPath.exists():
+        if not image_path.exists():
             print('Image path does not exist!')
             return
-        elif not imgPath.is_dir():
+        elif not image_path.is_dir():
             print('Image path is not a directory!')
             return
         else:
             # obtains list of .png files in given directory
             # -- can adjust to find multiple filetypes
-            images = imgPath.glob('**/*.png')
+            images = image_path.glob('**/*.png')
             image_list = [image for image in images]
             return image_list
 
-    def classify_images(self, unclassified_list):
-        """ docstring for main run function """
-        # return_dict = {label:[] for label in self.labels_list}
-        for label in self.labels_list:
-            # label_path = self.classified_labels_path + label
-            # if not (self.label_path.exists() and label_path.is_dir() and os.listdir(label_path)):
-                # print 'self.invalid label_path' 
-            continue
-        return return_dict
-    
+    def classify_sub_images(self, lbl_img, sub_lvl, x_path):
+        """ x_path : the path to the 'containing' image
+        (e.g. abc001) from which the sub-levels have been
+        dissected (e.g. abc001_L0_1, abc001_L1_0)
+         """
+        lbl_img_path = self.labels_images_path / lbl_img
+        dist_x = []
+        # list of distances of each sub_level_image
+        # (e.g. abc001_L0_12 or abc002_L17_35, etc.) to the
+        # given label
+
+        for img_x in sub_lvl:
+            img_x_path = x_path / img_x
+            if not lbl_img_path.exists():
+                print('Label image path does not exist!')
+            elif not img_x_path.exists():
+                print('Image path does not exist!')
+            else:
+                dist_to_label = find_matches_script.find_distance(str(img_x_path), str(lbl_img_path))
+                dist_x.append(dist_to_label)
+        return dist_x
+
     def format_csv(self):
-        """ docstring for main run function """
-        # stuff
-        data_frame = pd.DataFrame( { label : pd.Series( \
-        [len(matches) for file, matches in results] for \
-        label, results in result_dict.items() ) }, index=self.unclass)
+        """ docstring for format_csv function """
+        data_frame = pd.DataFrame({label : pd.Series(\
+        [len(matches) for file, matches in results]) for \
+        label, results in self.result_dict.items()}, index=self.unclassified_list)
+        data_frame.to_csv('img_results.csv')
         return
 
 if __name__ == '__main__':

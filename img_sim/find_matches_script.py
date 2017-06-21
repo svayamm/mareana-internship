@@ -46,24 +46,3 @@ the similarity of the given images.
     averageDist = sum(distances)/float(len(distances))
 
     return averageDist
-
-def main(handshake_dict, output_file):
-    """ docstring for main function 
-    
-    """
-    # assuming length of arguments passed in should be 2
-     
-    
-
-    for image_a in handshake_dict:
-        same_list = filter(lambda x: find_distance(image_a, x) < same_threshold, handshake_dict[image_a])
-        # same_list will return a list of images 
-        # with an avg. distance less than the 'same' 
-        # threshold
-        output_file.write('File: %s, Same images: %s \n' % (image_a, str(same_list)))
-
-if __name__ == '__main__':
-    # assuming argv[1] and argv[2] are the handshake dict
-    # and the output file location, passed in when the
-    # find_matches_script is called from the __main__ file.
-    main(sys.argv[1], sys.argv[2])
