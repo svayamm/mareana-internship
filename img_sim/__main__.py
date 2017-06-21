@@ -37,7 +37,7 @@ class FindMatchingImages(object):
     """docstring for FindMatchingImages.
     """
     def __init__(self):
-        self.threshold = 20 # arbitrary value
+        self.threshold = 100 # arbitrary value
         self.labels_images_path = Path('img_sim/classifier-labels/images')
         # assuming directory structure of Unclassified has
         # folders for individual images; while Labels are
@@ -46,7 +46,7 @@ class FindMatchingImages(object):
 
         self.label_images_list = self.create_image_list(self.labels_images_path)
 
-        self.unclassified_list = [str(x) for x in self.unclassified_path.iterdir() if x.is_dir()]
+        self.unclassified_list = [str(x.name) for x in self.unclassified_path.iterdir() if x.is_dir()]
 
         self.result_dict = defaultdict(dict)
 
@@ -56,6 +56,8 @@ class FindMatchingImages(object):
             self.result_dict[lbl_img] = defaultdict(list)
 
         self.fill_results_dict()
+        self.verify()
+        # print(sorted(self.result_dict.keys()))
         self.format_csv()
 
     def fill_results_dict(self):
@@ -76,11 +78,10 @@ class FindMatchingImages(object):
                     # list of 'dissected' levels of main
                     # file - 'abc001_L2_15, abc001_L7_0' etc
 
-                    x_path = self.unclassified_path / x
-
-                    x_dist = self.classify_sub_images(lbl_img, sub_level_imgs, x_path)
+                    x_dist = self.classify_sub_images(lbl_img, sub_level_imgs, x)
 
                     self.result_dict[lbl_img][str(x.name)] = filter(lambda d: d < self.threshold, x_dist)
+                    # print(len(filter(lambda d: d < self.threshold, x_dist)))
 
     
     def create_image_list(self, image_path):
@@ -94,8 +95,8 @@ class FindMatchingImages(object):
         else:
             # obtains list of .png files in given directory
             # -- can adjust to find multiple filetypes
-            images = image_path.glob('**/*.png')
-            image_list = [image for image in images]
+            images = image_path.glob('*.png')
+            image_list = [str(image.name) for image in images if not str(image.name).startswith('._')]
             return image_list
 
     def classify_sub_images(self, lbl_img, sub_lvl, x_path):
@@ -113,20 +114,29 @@ class FindMatchingImages(object):
             img_x_path = x_path / img_x
             if not lbl_img_path.exists():
                 print('Label image path does not exist!')
-            elif not img_x_path.exists():
-                print('Image path does not exist!')
+            if not img_x_path.exists():
+                print('Image path B does not exist!')
             else:
                 dist_to_label = find_matches_script.find_distance(str(img_x_path), str(lbl_img_path))
                 dist_x.append(dist_to_label)
+        # print(len(dist_x))
         return dist_x
 
     def format_csv(self):
         """ docstring for format_csv function """
-        data_frame = pd.DataFrame({label : pd.Series(\
-        [len(matches) for file, matches in results]) for \
-        label, results in self.result_dict.items()}, index=self.unclassified_list)
+        data_frame = pd.DataFrame({label : list(map(lambda x: len(x), results.values())) for label, results in self.result_dict.items()},index=self.unclassified_list)
         data_frame.to_csv('img_results.csv')
-        return
+        
+
+    def verify(self):
+        # print(sorted(self.result_dict.keys()) == sorted(self.label_images_list))
+        # print('AB')
+        for label, matches in self.result_dict.items():
+            
+            # print(label, sorted(matches.keys()) == sorted(self.unclassified_list))
+            # print(label, sorted(matches.keys()))
+            print (map(lambda x: len(x), matches.values()))
+            print()
 
 if __name__ == '__main__':
     obj = FindMatchingImages()
