@@ -1,7 +1,8 @@
 test_img/
 output/
 output_img/
-img_sim/classifier_labels/
-img_sim/unclassified_imgs/
+img_sim/classifier-labels/
+img_sim/unclassified-imgs/
+img_sim/unclassified-imgs-copy/
 google-cloud-sdk/
 google-cloud-sdk-2/

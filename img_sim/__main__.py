@@ -37,51 +37,44 @@ class FindMatchingImages(object):
     """docstring for FindMatchingImages.
     
     """
+    def __init__(self):
+        # same_threshold = 20 # arbitrary value
+        self.labels_images_path = Path('img_sim/classifier-labels/images')
+        # assuming directory structure of Unclassified has
+        # folders for individual images; while Labels are
+        # 'flattened' - i.e. no subdirectories
+        self.unclassified_path = Path('img_sim/unclassified-imgs-copy')
+        # self.output_Path = Path('img_sim/test_output_img')
+
+        self.label_images_list = create_image_list(self.labels_images_Path)
+        
+        self.unclassified_list = [str(x) for x in self.unclassified_Path.iterdir() if x.is_dir()]
+        
+        self.result_dict = defaultdict(dict)
+
+        
 
     def run(self):
         """ docstring for main run function """
-        # same_threshold = 20 # arbitrary value
-        self.labels_images_Path = Path('img_sim/classifier-labels/images')
-        # assuming directory structure of Unclassified has
-        # folders for individual images; while Labels are
-        # 'flattened' - i.e. no subdirectories 
-        self.unclassified_Path = Path('img_sim/unclassified-imgs-copy')
-        self.output_Path = Path('img_sim/test_output_img')
-
-        # self.labels_list = [str(x) for x in self.labels_Path.iterdir() if x.is_dir()]
-
-        label_images_list = create_image_list(self.labels_images_Path)
-        # unclassified_images = create_image_list()
-
-        self.result_dict = defaultdict(dict)
-
-        for lbl_img in label_images_list:
+        
+        for lbl_img in self.label_images_list:
             # lbl_img_path = resolve
             result_dict[lbl_img] = defaultdict(list) 
 
-
         find_matches_script.main(hs_dict, output_File)
 
-    # def create_new_empty_folders(self):
-    #     """ docstring for main run function """
-    #     for label in self.labels_list:
-    #         # new_dir = Path resolve (output_path+label)
-    #         # if not new_dir.exists():
-    #         #     os.makedirs()
-    #         continue
-
     
-    def create_new_empty_folders(self):
+    def fill_results_dict(self):
         """ docstring for main run function 
         
         regarding efficiency - 
         nested for loop results in higher-order polynomial
-        complexity
+        complexity; necessitated due to pairwise comparison?
 
         Path.iterdir() v os.scandir()
         
         """
-        for lbl_img in label_images_list:
+        for lbl_img in self.label_images_list:
             # lbl_img_path = resolve
             for x in self.unclassified_Path.iterdir():
                 if x.is_dir(): 
@@ -92,23 +85,24 @@ class FindMatchingImages(object):
                     # file - 'abc001_L2_15, abc001_L7_0' etc
 
             continue
-
-    def create_image_list(self, img_Path):
+    
+    @staticmethod
+    def create_image_list(imgPath):
         """ docstring for main run function """
-        if not img_Path.exists():
+        if not imgPath.exists():
             print('Image path does not exist!')
             return
-        elif not img_Path.is_dir():
+        elif not imgPath.is_dir():
             print('Image path is not a directory!')
             return
         else:
             # obtains list of .png files in given directory
             # -- can adjust to find multiple filetypes
-            images = img_Path.glob('**/*.png')
+            images = imgPath.glob('**/*.png')
             image_list = [image for image in images]
             return image_list
 
-    def classify_images(self, self.unclassified_list):
+    def classify_images(self, unclassified_list):
         """ docstring for main run function """
         # return_dict = {label:[] for label in self.labels_list}
         for label in self.labels_list:
@@ -118,10 +112,13 @@ class FindMatchingImages(object):
             continue
         return return_dict
     
-def format_csv():
-    """ docstring for main run function """
-    # stuff
-    return
+    def format_csv(self):
+        """ docstring for main run function """
+        # stuff
+        data_frame = pd.DataFrame( { label : pd.Series( \
+        [len(matches) for file, matches in results] for \
+        label, results in result_dict.items() ) }, index=self.unclass)
+        return
 
 if __name__ == '__main__':
     obj = FindMatchingImages()
