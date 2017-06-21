@@ -53,7 +53,7 @@ def main(handshake_dict, output_file):
     """
     # assuming length of arguments passed in should be 2
      
-    same_threshold = 20 # arbitrary value
+    
 
     for image_a in handshake_dict:
         same_list = filter(lambda x: find_distance(image_a, x) < same_threshold, handshake_dict[image_a])
