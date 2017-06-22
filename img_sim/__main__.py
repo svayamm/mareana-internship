@@ -29,6 +29,7 @@ empty the output folder before running
 import os
 import sys
 from collections import defaultdict
+from itertools import compress
 import pandas as pd
 from pathlib2 import Path
 import find_matches_script
@@ -37,18 +38,22 @@ class FindMatchingImages(object):
     """docstring for FindMatchingImages.
     """
     def __init__(self):
-        self.threshold = 80 # arbitrary value
+        self.feat_dist_threshold = 1.63 # arbitrary value
         self.labels_images_path = Path('img_sim/classifier-labels/images')
         # assuming directory structure of Unclassified has
         # folders for individual images; while Labels are
         # 'flattened' - i.e. no subdirectories
         self.unclassified_path = Path('img_sim/unclassified-imgs-copy')
+        # TODO: Sort output_png folder into constituent imgs
 
         self.label_images_list = self.create_image_list(self.labels_images_path)
 
         self.unclassified_list = [str(x.name) for x in self.unclassified_path.iterdir() if x.is_dir()]
 
         self.result_dict = defaultdict(dict)
+        self.algo = "T_M" 
+        # T_M = Template Matching
+        # F_M = Feature Matching
 
     def run(self):
         """ docstring for main run function """
@@ -78,11 +83,24 @@ class FindMatchingImages(object):
                     # list of 'dissected' levels of main
                     # file - 'abc001_L2_15, abc001_L7_0' etc
 
-                    x_dist = self.classify_sub_images(lbl_img, sub_level_imgs, x)
+                    if self.algo == "F_M":
+                        x_dist = self.classify_sub_images(lbl_img, sub_level_imgs, x)
 
-                    self.result_dict[lbl_img][str(x.name)] = filter(lambda d: d < self.threshold, x_dist)
-                    # print(len(filter(lambda d: d < self.threshold, x_dist)))
+                        self.result_dict[lbl_img][str(x.name)] = filter(lambda d: d <= self.feat_dist_threshold, x_dist)
+                        print(self.result_dict[lbl_img][str(x.name)])
 
+                        bool_dist = map(lambda d: d <= self.feat_dist_threshold, x_dist)
+                        matching_sub = list(compress(sub_level_imgs, bool_dist))
+                        print(lbl_img, matching_sub)
+                        # print(len(filter(lambda d: d < self.feat_dist_threshold, x_dist)))
+                    elif self.algo == "T_M":
+                        bool_matches = self.classify_sub_images(lbl_img, sub_level_imgs, x)
+
+                        matching_sub = list(compress(sub_level_imgs, bool_matches))
+                        # list of sub-lev files that matched
+
+                        self.result_dict[lbl_img][str(x.name)] = matching_sub
+                        print(lbl_img, matching_sub)
     
     def create_image_list(self, image_path):
         """ docstring for main run function """
@@ -105,7 +123,7 @@ class FindMatchingImages(object):
         dissected (e.g. abc001_L0_1, abc001_L1_0)
          """
         lbl_img_path = self.labels_images_path / lbl_img
-        dist_x = []
+        list_x = []
         # list of distances of each sub_level_image
         # (e.g. abc001_L0_12 or abc002_L17_35, etc.) to the
         # given label
@@ -117,13 +135,20 @@ class FindMatchingImages(object):
             if not img_x_path.exists():
                 print('Image path B does not exist!')
             else:
-                dist_to_label = find_matches_script.find_distance(str(img_x_path), str(lbl_img_path))
-                # if lbl_img == 'JBR01974_L2_20.png':
-                #     if dist_to_label < self.threshold:
-                #         print(img_x)
-                dist_x.append(dist_to_label)
-        # print(len(dist_x))
-        return dist_x
+                if self.algo == "F_M":
+                    # TODO: keypoints dictionary to reduce
+                    # time taken in detect&Compute
+                    dist_to_label = find_matches_script.find_distance(str(img_x_path), str(lbl_img_path), self.algo)
+
+                    list_x.append(dist_to_label)
+                elif self.algo == "T_M":
+                    list_of_points = find_matches_script.find_distance(str(img_x_path), str(lbl_img_path), self.algo)
+
+                    match_found = list_of_points >= 0
+
+                    list_x.append(match_found)
+        # print(len(list_x))
+        return list_x
 
     def format_csv(self):
         """ docstring for format_csv function """
@@ -131,7 +156,7 @@ class FindMatchingImages(object):
         data_frame.to_csv('img_results.csv')
         
 
-    # def verify(self):
+    # def verify(self): # debugging w/ print statements
     #     # print(sorted(self.result_dict.keys()) == sorted(self.label_images_list))
     #     # print('AB')
     #     for label, matches in self.result_dict.items():
