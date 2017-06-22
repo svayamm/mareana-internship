@@ -31,13 +31,13 @@ import sys
 from collections import defaultdict
 import pandas as pd
 from pathlib2 import Path
-from . import find_matches_script
+import find_matches_script
 
 class FindMatchingImages(object):
     """docstring for FindMatchingImages.
     """
     def __init__(self):
-        self.threshold = 100 # arbitrary value
+        self.threshold = 80 # arbitrary value
         self.labels_images_path = Path('img_sim/classifier-labels/images')
         # assuming directory structure of Unclassified has
         # folders for individual images; while Labels are
@@ -56,7 +56,7 @@ class FindMatchingImages(object):
             self.result_dict[lbl_img] = defaultdict(list)
 
         self.fill_results_dict()
-        self.verify()
+        # self.verify()
         # print(sorted(self.result_dict.keys()))
         self.format_csv()
 
@@ -118,6 +118,9 @@ class FindMatchingImages(object):
                 print('Image path B does not exist!')
             else:
                 dist_to_label = find_matches_script.find_distance(str(img_x_path), str(lbl_img_path))
+                # if lbl_img == 'JBR01974_L2_20.png':
+                #     if dist_to_label < self.threshold:
+                #         print(img_x)
                 dist_x.append(dist_to_label)
         # print(len(dist_x))
         return dist_x
@@ -128,15 +131,17 @@ class FindMatchingImages(object):
         data_frame.to_csv('img_results.csv')
         
 
-    def verify(self):
-        # print(sorted(self.result_dict.keys()) == sorted(self.label_images_list))
-        # print('AB')
-        for label, matches in self.result_dict.items():
-            
-            # print(label, sorted(matches.keys()) == sorted(self.unclassified_list))
-            # print(label, sorted(matches.keys()))
-            print (map(lambda x: len(x), matches.values()))
-            print()
+    # def verify(self):
+    #     # print(sorted(self.result_dict.keys()) == sorted(self.label_images_list))
+    #     # print('AB')
+    #     for label, matches in self.result_dict.items():
+    #         if label == 'JBR01974_L2_19.png':
+    #             for x in matches.values():
+    #                 print(label, x)
+    #         # print(label, sorted(matches.keys()) == sorted(self.unclassified_list))
+    #         # print(label, sorted(matches.keys()))
+    #         # print (map(lambda x: len(x), matches.values()))
+    #         print()
 
 if __name__ == '__main__':
     obj = FindMatchingImages()
