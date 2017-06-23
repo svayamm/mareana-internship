@@ -1,5 +1,21 @@
-import os
-import sys
+
+"""
+Uses OpenCV 2.x and Python 2.7.x, installed through Miniconda3
+    -- this will NOT work with OpenCV 3 / Python 3, due to
+    issues with the Python binding.
+
+    Run with python -m img_sim from containing directory
+
+    Note: this is just a quick-and-dirty solution - ideally
+    proper error-handling methods would be implemented, and
+    the code itself would be properly refactored.
+    unit testing
+    instead of arbitrary values, optimised
+    perhaps inbuilt clustering methods used
+# Download and install the pathlib2 library using Miniconda3
+empty the output folder before running
+"""
+
 import numpy as np
 import imutils
 import cv2
@@ -103,12 +119,12 @@ algo = "T_M" -- template matching; "F_M" -- feature matching
             # matching to find the template in the image
             edged = cv2.Canny(resized, 50, 200)
             result = cv2.matchTemplate(edged, template, cv2.TM_CCOEFF_NORMED)
-            print(cv2.minMaxLoc(result))
             # matrix / map of comparisons at each point
             # If image is W * H and templ is w * h , then result is (W-w+1) * (H-h+1)
 
-            threshold = 0.99
-            locations = np.where(result >= threshold)
+            threshold = 0.95
+            locations = np.where((result>=threshold).all())
+     
             # locations where matches are found
             # i.e. correlation coefficient >= threshold
 

@@ -26,8 +26,6 @@ Uses OpenCV 2.x and Python 2.7.x, installed through Miniconda3
 empty the output folder before running
 """
 
-import os
-import sys
 from collections import defaultdict
 from itertools import compress
 import pandas as pd
@@ -62,7 +60,6 @@ class FindMatchingImages(object):
 
         self.fill_results_dict()
         # self.verify()
-        # print(sorted(self.result_dict.keys()))
         self.format_csv()
 
     def fill_results_dict(self):
@@ -100,7 +97,6 @@ class FindMatchingImages(object):
                         # list of sub-lev files that matched
 
                         self.result_dict[lbl_img][str(x.name)] = matching_sub
-                        print(lbl_img, matching_sub)
     
     def create_image_list(self, image_path):
         """ docstring for main run function """
@@ -144,29 +140,29 @@ class FindMatchingImages(object):
                 elif self.algo == "T_M":
                     list_of_points = find_matches_script.find_distance(str(img_x_path), str(lbl_img_path), self.algo)
 
-                    match_found = list_of_points >= 0
+                    match_found = bool(list_of_points)
+                    # false if Null or empty list; else true
 
                     list_x.append(match_found)
-        # print(len(list_x))
         return list_x
 
     def format_csv(self):
         """ docstring for format_csv function """
-        data_frame = pd.DataFrame({label : list(map(lambda x: len(x), results.values())) for label, results in self.result_dict.items()},index=self.unclassified_list)
+        tup_list = [(main, label, sub) for label, results in self.result_dict.iteritems() for main, subs in results.iteritems() for sub in subs]
+        data_frame = pd.DataFrame(tup_list, columns=['main_file', 'label_img', 'sub_level_file'])
         data_frame.to_csv('img_results.csv')
-        
 
-    # def verify(self): # debugging w/ print statements
-    #     # print(sorted(self.result_dict.keys()) == sorted(self.label_images_list))
-    #     # print('AB')
-    #     for label, matches in self.result_dict.items():
-    #         if label == 'JBR01974_L2_19.png':
-    #             for x in matches.values():
-    #                 print(label, x)
-    #         # print(label, sorted(matches.keys()) == sorted(self.unclassified_list))
-    #         # print(label, sorted(matches.keys()))
-    #         # print (map(lambda x: len(x), matches.values()))
-    #         print()
+    '''def verify(self): # debugging w/ print statements
+        # print(sorted(self.result_dict.keys()) == sorted(self.label_images_list))
+        # print('AB')
+        for label, matches in self.result_dict.items():
+            if label == 'JBR01974_L2_19.png':
+                for x in matches.values():
+                    print(label, x)
+            # print(label, sorted(matches.keys()) == sorted(self.unclassified_list))
+            # print(label, sorted(matches.keys()))
+            # print (map(lambda x: len(x), matches.values()))
+            print()'''
 
 if __name__ == '__main__':
     obj = FindMatchingImages()
