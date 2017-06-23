@@ -32,7 +32,7 @@ features between 2 given images. The Hamming distance between the feature
 descriptors is calculated; with a lower distance indicating a better match in
 features.
 
-The average of the 10 best (lowest distance) matches is used as an indicator of
+The average of the matches is used as an indicator of
 the similarity of the given images.
 @image_1_path : Unclassified
 @image_2_path : Label (i.e. template)
@@ -104,11 +104,8 @@ algo = "T_M" -- template matching; "F_M" -- feature matching
         # Based on http://www.pyimagesearch.com/2015/01/26/multi-scale-template-matching-using-python-opencv/
 
         for scale in np.linspace(0.2, 1.0, 20)[::-1]:
-            # resize the image according to the scale, and keep track
-            # of the ratio of the resizing
+            # resize the image according to the scale
             resized = imutils.resize(img1, width=int(img1.shape[1]*scale))
-            # r = img1.shape[1] / float(resized.shape[1])
-            # r is ratio between image and resized (unused)
 
             # if the resized image is smaller than the template, then break
             # from the loop
