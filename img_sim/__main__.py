@@ -28,9 +28,11 @@ empty the output folder before running
 
 from collections import defaultdict
 from itertools import compress
+import shutil
 import pandas as pd
 from pathlib2 import Path
 import find_matches_script
+
 
 class FindMatchingImages(object):
     """docstring for FindMatchingImages.
@@ -41,8 +43,8 @@ class FindMatchingImages(object):
         # assuming directory structure of Unclassified has
         # folders for individual images; while Labels are
         # 'flattened' - i.e. no subdirectories
-        self.unclassified_path = Path('img_sim/unclassified-imgs-copy')
-        # TODO: Sort output_png folder into constituent imgs
+        self.unclassified_path = Path('output_png_classified')
+        
 
         self.label_images_list = self.create_image_list(self.labels_images_path)
 
@@ -58,9 +60,23 @@ class FindMatchingImages(object):
         for lbl_img in self.label_images_list:
             self.result_dict[lbl_img] = defaultdict(list)
 
+        self.put_unclassified_imgs_in_folders()
         self.fill_results_dict()
         # self.verify()
         self.format_csv()
+
+    def put_unclassified_imgs_in_folders(self):
+        # Sort output_png folder into constituent imgs
+        unsorted_imgs = self.create_image_list(self.unclassified_path)
+        for img in unsorted_imgs:
+            main_name = img.split('_')[0]
+            if main_name not in self.unclassified_list:
+                new_dir = self.unclassified_path / main_name
+                img_path = self.unclassified_path / img
+                if not new_dir.exists(): new_dir.mkdir()
+                shutil.move(str(img_path), str(new_dir))
+        # reinitialise unclassified list to take new folders into account
+        self.unclassified_list = [str(x.name) for x in self.unclassified_path.iterdir() if x.is_dir()]
 
     def fill_results_dict(self):
         """ docstring for fill_results_dict function
