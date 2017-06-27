@@ -3,6 +3,7 @@ output/
 output_img/
 output_png/
 output_png_classified/
+DM-Label/
 
 img_sim/classifier-labels/
 img_sim/unclassified-imgs/
@@ -15,3 +16,4 @@ profile_output_template
 img_sim/find_matches_script.pyc
 ~$img_results_comp.xlsx
 ~$img_results_comp_2.xlsx
+~$img_results_comp_eps_bw.xlsx
