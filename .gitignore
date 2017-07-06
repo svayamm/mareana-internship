@@ -4,6 +4,7 @@ Kallik/output_img/
 Kallik/output_png/
 Kallik/output_png_classified/
 Kallik/DM-Label/
+Kallik/profiler-results/
 
 Kallik/img_sim/classifier-labels/
 Kallik/img_sim/unclassified-imgs/

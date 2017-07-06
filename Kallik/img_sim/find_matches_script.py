@@ -1,21 +1,16 @@
-
 """
-Uses OpenCV 2.x and Python 2.7.x, installed through Miniconda3
-    -- this will NOT work with OpenCV 3 / Python 3, due to
-    issues with the Python binding.
+This script accompanies the __main__ file for the img_sim
+module.
 
-    Run with python -m img_sim from containing directory
+Uses the following libraries, installed through Miniconda3:
+    - numpy
+    - imutils
+    - OpenCV 2.x (as cv2)
 
-    Note: this is just a quick-and-dirty solution - ideally
-    proper error-handling methods would be implemented, and
-    the code itself would be properly refactored.
-    unit testing
-    instead of arbitrary values, optimised
-    perhaps inbuilt clustering methods used
-# Download and install the pathlib2 library using Miniconda3
-empty the output folder before running
+This script has been written to run on Python 2.7.x -- it 
+will NOT work with OpenCV 3 / Python 3, due to issues with 
+the Python binding for OpenCV3.
 """
-
 import numpy as np
 import imutils
 import cv2
@@ -53,16 +48,6 @@ algo = "T_M" -- template matching; "F_M" -- feature matching
         # TODO: Memoize to reduce # of expensive calls
         kp1, des1 = orb.detectAndCompute(img1, None)
         kp2, des2 = orb.detectAndCompute(img2, None)
-
-        # # FLANN parameters -- default values; taken from OpenCV documentation
-        # FLANN_INDEX_KDTREE = 0
-        # index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
-        # search_params = dict(checks=50)   # or pass empty dictionary
-
-        # flann = cv2.FlannBasedMatcher(index_params, search_params)
-
-        # # matches = flann.knnMatch(np.float32(des1), np.float32(des2), k=2)
-        # # # must convert descriptors to 32-bit float
 
         # create BFMatcher object
         bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
