@@ -23,50 +23,53 @@ TODO: Optimise threshold (and other) values, instead of
 """
 ############################################################
 
+import shutil
 from collections import defaultdict
 from itertools import compress
-import shutil
+
 import pandas as pd
-from pathlib2 import Path
+
 import find_matches_script
+from pathlib2 import Path
 
 
 class FindMatchingImages(object):
     """
     The program runs as an instance of the FindMatchingImages class.
 
-    <<Description>>
+    <<Description>> When script is run, an instance of the class is created
+    initialising the variables (in __init__) and the run() function is called. 
+    (line ###220###)
 
-    Attributes:
-            label_images_lst (`list` of `str`): Description of `param3`.
+    
     """
 
     def __init__(self):
         """
         The various constants and variables are initiated here.
 
-        <<Description>>
+        #Attributes:#
 
-        
+        ###Constants###
+        *These are not expected to change during the program's execution, though
+        they can be changed prior to running the program.*
+
+        label_images_lst (`list` of `str`): 
+           Creates a list of filenames, of all the 'labels'.
 
         """
-        ##### Constants #####
-        ### These are not expected to change during the
-        ### program's execution; though they can be changed
-        ### prior to running the program.
-
+        
         self.labels_images_path = Path('img_sim/classifier-labels/images')
-        # assuming directory structure of Labels is
-        # 'flattened' - i.e. no subdirectories, all Label 
-        # ('benchmark') images in single folder.
+        # assuming directory structure of Labels is 'flattened' - i.e. no 
+        # subdirectories, all Label ('benchmark') images in single folder.
         self.unclassified_path = Path('output_png_classified')
-        # assuming directory structure of Unclassified has
-        # folders for individual images - i.e. sub-level 
-        # files (e.g. abc001_L1_14) are grouped into 
-        # folders by the file (e.g. abc001) they were 
-        # extracted from.
+        # assuming directory structure of Unclassified has folders for 
+        # individual images - i.e. sub-level files (e.g. abc001_L1_14) are 
+        # grouped into folders by the file (e.g. abc001) they were extracted 
+        # from.
+        
         self.label_images_lst = self.create_image_list(self.labels_images_path)
-        # Creates a list of filenames, of all the 'labels'.
+        
         self.algo = "T_M"
         # Set thealgorithm to be used in matcher script
         # T_M = Template Matching
@@ -77,7 +80,10 @@ class FindMatchingImages(object):
 
         ##### Variables #####
 
-        self.unclassified_list = [str(x.name) for x in self.unclassified_path.iterdir() if x.is_dir()]
+        self.unclassified_list = [
+            str(x.name) 
+            for x in self.unclassified_path.iterdir() 
+            if x.is_dir()]
 
         self.result_dict = defaultdict(dict)
 
@@ -92,8 +98,8 @@ class FindMatchingImages(object):
         self.format_csv()
 
     def put_unclassified_imgs_in_folders(self):
-        """ docstring for main run function """
-        # Sort output_png folder into constituent imgs
+        """Sort output_png folder into constituent imgs."""
+         
         unsorted_imgs = self.create_image_list(self.unclassified_path)
         for img in unsorted_imgs:
             main_name = img.split('_')[0]
@@ -141,7 +147,10 @@ class FindMatchingImages(object):
                         self.result_dict[lbl_img][str(x.name)] = matching_sub
     
     def create_image_list(self, image_path):
-        """ docstring for main run function """
+        """ 
+        Args:
+            x_path: the path
+             """
         if not image_path.exists():
             print('Image path does not exist!')
             return
@@ -161,7 +170,12 @@ class FindMatchingImages(object):
             x_path: the path to the 'containing' image (e.g. abc001) from which
                 the sub-levels have been dissected (e.g. abc001_L0_1,
                 abc001_L1_0)
-         """
+
+        Attributes:
+            lbl_img_path (`list` of `str`): Creates a list of filenames, of
+                all the 'labels'.
+
+        """
         lbl_img_path = self.labels_images_path / lbl_img
         list_x = []
         # list of distances of each sub_level_image

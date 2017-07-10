@@ -21,14 +21,6 @@ def find_distance(image_1_path, image_2_path, algo):
     - makes assumption that images being passed in are of
     same size; else resize to same size
     - 
-
-    Using a FLANN-based feature matcher with the ORB algorithm to find matching
-features between 2 given images. The Hamming distance between the feature
-descriptors is calculated; with a lower distance indicating a better match in
-features.
-
-The average of the matches is used as an indicator of
-the similarity of the given images.
 @image_1_path : Unclassified
 @image_2_path : Label (i.e. template)
 
@@ -41,6 +33,15 @@ algo = "T_M" -- template matching; "F_M" -- feature matching
     img2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
 
     if algo == "F_M":
+        """
+        Using a FLANN-based feature matcher with the ORB algorithm to find 
+        matching features between 2 given images. The Hamming distance between 
+        the feature descriptors is calculated; with a lower distance indicating 
+        a better match in features.
+        The average of the matches is used as an indicator of the similarity of 
+        the given images.
+        
+        """
         # Initiate ORB detector
         orb = cv2.ORB()
 
@@ -68,10 +69,7 @@ algo = "T_M" -- template matching; "F_M" -- feature matching
             distances = map(lambda x:x.distance, matches)
             # get average distance of all matches 
             averageDist = np.average(distances)
-
-
             # print(len(matches), averageDist)
-
             return averageDist
         else: 
             # avoid NaN error with arbiratily high dist
